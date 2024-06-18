@@ -136,7 +136,7 @@ jobs:
       - parse
 
     if: >
-      needs.parse.outputs.type == 'submission'
+      needs.parse.outputs.type == 'addition'
 
     runs-on: ubuntu-latest
 
