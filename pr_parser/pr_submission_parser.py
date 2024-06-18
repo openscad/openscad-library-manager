@@ -4,6 +4,7 @@ import os
 import subprocess
 import tempfile
 import tomllib
+from enum import StrEnum
 from pathlib import Path
 from urllib.parse import ParseResult, urlparse
 
@@ -11,7 +12,6 @@ import requests
 import unidiff
 
 MANIFEST_FILENAME = "manifest.toml"
-# MANIFEST_FILE_NAME = "library.properties"
 INDEX_SOURCE_SEPARATOR = "||"
 OUTPUT_INDENTATION = 2
 
@@ -24,7 +24,6 @@ SUPPORTED_HOSTS = [
 
 OFFICIAL_ORGANIZATIONS = [
     "github.com/openscad",
-    # "github.com/makerlabvn",
 ]
 
 VALID_REPO_TYPES = [
@@ -75,8 +74,6 @@ class Utils:
         if isinstance(raw_url, str):
             raw_url = urlparse(raw_url)
 
-        return raw_url  # TODO: remove this
-
         normalized_url = raw_url._replace(path=raw_url.path.rstrip("/"))
 
         if normalized_url.path == "":
@@ -106,7 +103,6 @@ class Utils:
         bool
             True if the URL is under any of the candidates.
         """
-        return True  # TODO: remove this
         if isinstance(candidates, str):
             candidates = [candidates]
 
@@ -252,7 +248,7 @@ class Submission:
 
             self.name = manifest_data["library"]["name"]
             self.index_entry = INDEX_SOURCE_SEPARATOR.join(
-                (self.normalized_url, "", self.name)
+                (self.normalized_url, self.name)
             )
 
 
@@ -339,40 +335,28 @@ def main() -> int:
         help="Path to PR diff file.",
     )
     parser.add_argument(
-        "--repopath",
+        "--listpath",
         required=True,
-        help="Path to index repository.",
-    )
-    parser.add_argument(
-        "--listname",
-        required=True,
-        help="List file name.",
+        help="Path to List file.",
     )
 
-    # diff_loc = parser.diffpath
-    # repo_loc = parser.repopath
-    # list_name = parser.listname
-    diff_loc = f"{Path(__file__).parent.as_posix()}/diff_file4.diff"
-    repo_loc = f"{Path(__file__).parent.as_posix()}"
-    list_name = f"{Path(__file__).parent.as_posix()}/list_file.txt"
+    args = parser.parse_args()
+    diff_loc = args.diffpath
+    list_loc = args.listpath
 
     diff_path = Path(diff_loc)
-    list_path = Path(repo_loc) / list_name
+    list_path = Path(list_loc)
 
     if not diff_path.exists():
-        Utils.error_exit("diff file must exist")
+        Utils.error_exit(f"diff file must exist: {diff_path}")
 
     if not list_path.exists():
-        Utils.error_exit(f"list file {list_name} not found")
+        Utils.error_exit(f"list file must exist: {list_path}")
 
     req = SubmissionRequest(diff_path, list_path)
 
     json_str = json.dumps(req, cls=MyEncoder, indent=OUTPUT_INDENTATION)
     print(json_str)
-
-    # print("=" * 100)
-
-    # print(json.loads(json_str))
 
     return 0
 
