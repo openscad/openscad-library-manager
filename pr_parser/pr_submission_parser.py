@@ -272,8 +272,8 @@ class SubmissionRequest:  # pull request
 
         if (
             (len(diffs) != 1)
-            or (diffs[0].source_file != list_path.name)
-            or (diffs[0].source_file != diffs[0].target_file)
+            or (Path(diffs[0].source_file).name != list_path.name)
+            or (Path(diffs[0].target_file).name != list_path.name)
         ):
             Utils.error_exit(f"Not a library manager submission.")
 
