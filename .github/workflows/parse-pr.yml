@@ -124,8 +124,8 @@ jobs:
             --diffpath="${{ needs.diff.outputs.path }}/${{ needs.diff.outputs.filename }}" \
             --listpath="${{ env.LISTFILE_LOC }}" \
             2>&1 \
-            | tee /dev/tty
         )"
+        echo "$REQUEST"
         echo "::set-output name=type::$(echo "$REQUEST" | jq -r -c '.type')"
         echo "::set-output name=submissions::$(echo "$REQUEST" | jq -c '.submissions')"
         echo "::set-output name=index-entry::$(echo "$REQUEST" | jq -r -c '.index_entry')"

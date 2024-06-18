@@ -53,7 +53,7 @@ class Utils:
     @staticmethod
     def error_exit(msg: str):
         print(f"ERROR: {msg}")
-        exit(1)
+        exit(0)
 
     @staticmethod
     def normalize_git_url(raw_url: ParseResult | str) -> ParseResult:
