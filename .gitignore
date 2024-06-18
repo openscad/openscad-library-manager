@@ -1,0 +1,5 @@
+.vscode/settings.json
+*.pyc
+.venv/
+*.old
+*.new
