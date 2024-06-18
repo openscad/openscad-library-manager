@@ -48,7 +48,6 @@ class Utils:
         bool
             True if the response is 200 (OK). False otherwise.
         """
-        return True  # TODO: remove this
         return requests.get(url.geturl()).ok
 
     @staticmethod
