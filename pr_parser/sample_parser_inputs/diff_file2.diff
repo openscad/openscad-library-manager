@@ -1,0 +1,8 @@
+--- list_file.txt	2024-05-10 11:59:34.290154219 +0300
++++ list_file.txt	2024-05-10 12:28:18.656213829 +0300
+@@ -1,2 +1,4 @@
+ https://github.com/ZeeDesigns7/AdvancedSerial
+ https://github.com/brincode/Fa3el_kher
++/home/malin/ws/parser/test_repo_1
++/home/malin/ws/parser/test_repo_2
+\ No newline at end of file
