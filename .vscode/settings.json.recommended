@@ -1,0 +1,16 @@
+{
+    ////////////////////////////////////////////////////////////////////////////
+    // Language specific
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit",
+        },
+    },
+    ////////////////////////////////////////////////////////////////////////////
+    // Extensions
+    // // Auto Docstring
+    "autoDocstring.docstringFormat": "numpy",
+    ////////////////////////////////////////////////////////////////////////////
+}

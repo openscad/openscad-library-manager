@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "ms-python.black-formatter", // For formatting Python code
+        "ms-python.isort",           // For sorting Python imports
+        "tamasfe.even-better-toml",  // For generating Python docstrings
+        "njpwerner.autodocstring"    // For TOML syntax highlighting and linting
+    ]
+}
