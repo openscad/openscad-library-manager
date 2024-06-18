@@ -100,6 +100,10 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
+    - name: Install Python Packages
+      run: |
+        pip3 install "${{ github.workspace }}/pr_parser/requirements.txt"
+
     - name: Download diff
       uses: actions/download-artifact@v3
       with:
