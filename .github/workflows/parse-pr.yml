@@ -103,7 +103,7 @@ jobs:
     - name: Install Python Packages
       run: |
         python${{ env.PYTHON_VERSION }} -m pip install --upgrade pip
-        python${{ env.PYTHON_VERSION }} -m pip install "${{ github.workspace }}/pr_parser/requirements.txt"
+        python${{ env.PYTHON_VERSION }} -m pip install -r "${{ github.workspace }}/pr_parser/requirements.txt"
 
     - name: Download diff
       uses: actions/download-artifact@v3
