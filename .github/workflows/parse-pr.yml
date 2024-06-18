@@ -120,9 +120,11 @@ jobs:
       id: parse-request
       run: |
         REQUEST="$( \
-          python${{ env.PYTHON_VERSION }} "${{ github.workspace }}/pr_parser/pr_submission_parser.py" \
+          python${{ env.PYTHON_VERSION }} -u "${{ github.workspace }}/pr_parser/pr_submission_parser.py" \
             --diffpath="${{ needs.diff.outputs.path }}/${{ needs.diff.outputs.filename }}" \
             --listpath="${{ env.LISTFILE_LOC }}" \
+            2>&1 \
+            | tee /dev/tty
         )"
         echo "::set-output name=type::$(echo "$REQUEST" | jq -r -c '.type')"
         echo "::set-output name=submissions::$(echo "$REQUEST" | jq -c '.submissions')"
