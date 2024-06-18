@@ -111,10 +111,10 @@ jobs:
         path: ${{ needs.diff.outputs.path }}
         name: ${{ needs.diff.outputs.artifact }}
 
-    - name: Remove no longer needed artifact from workflow
-      uses: geekyeggo/delete-artifact@v2
-      with:
-        name: ${{ needs.diff.outputs.artifact }}
+    # - name: Remove no longer needed artifact from workflow
+    #   uses: geekyeggo/delete-artifact@v2
+    #   with:
+    #     name: ${{ needs.diff.outputs.artifact }}
 
     - name: Parse request
       id: parse-request
