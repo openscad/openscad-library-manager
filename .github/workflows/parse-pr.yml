@@ -1,0 +1,188 @@
+name: Automatically handle new library submissions
+
+env:
+  # See: https://github.com/actions/setup-python/tree/main#available-versions-of-python
+  PYTHON_VERSION: "3.12"
+  LISTFILE_LOC: "output_files/list_file.txt"
+  ACCEPTED_REPOSITORIES_LOC: "output_files/accepted_repositories.txt"
+
+on:
+  pull_request_target:
+    types:
+    - opened
+    - ready_for_review
+    - synchronize
+
+  issue_comment:
+    types:
+    - created
+    - edited
+
+
+jobs:
+  diff:
+    if: >
+      (
+        github.event_name == 'pull_request_target' &&
+        github.event.pull_request.draft == false
+      ) ||
+      (
+        github.event_name == 'issue_comment' &&
+        github.event.issue.pull_request != '' &&
+        github.event.issue.state == 'open' &&
+        contains(github.event.comment.body, 'SCADBot')
+      )
+    runs-on: ubuntu-latest
+
+    outputs:
+      artifact: ${{ steps.configuration.outputs.artifact }}
+      path: ${{ steps.configuration.outputs.path }}
+      filename: ${{ steps.configuration.outputs.filename }}
+      head: ${{ steps.head.outputs.head }}
+
+    env:
+      # See: https://docs.github.com/rest/reference/pulls#custom-media-types-for-pull-requests
+      DIFF_IDENTIFIER: diff
+      JSON_IDENTIFIER: raw+json
+
+    steps:
+      - name: Set configuration outputs
+        id: configuration
+        run: |
+          echo "::set-output name=artifact::diff"
+          echo "::set-output name=path::${{ runner.temp }}"
+          echo "::set-output name=filename::${{ env.DIFF_IDENTIFIER }}"
+
+      - name: Get PR data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          parallel \
+            ' \
+              curl \
+                --fail \
+                --output "${{ steps.configuration.outputs.path }}/{}" \
+                --header "Authorization: token $GITHUB_TOKEN" \
+                --header "Accept: application/vnd.github.v3.{}" \
+                https://api.github.com/repos/${{ github.repository_owner }}/${{ github.event.repository.name }}/pulls/${{ github.event.pull_request.number }}${{ github.event.issue.number }}
+            ' \
+            ::: \
+              ${{ env.DIFF_IDENTIFIER }} \
+              ${{ env.JSON_IDENTIFIER }}
+
+      - name: Get head SHA of diff
+        id: head
+        run: echo "::set-output name=head::$(jq -c .head.sha "${{ steps.configuration.outputs.path }}/${{ env.JSON_IDENTIFIER }}")"
+
+      - name: Upload diff file to workflow artifact
+        uses: actions/upload-artifact@v3
+        with:
+          path: ${{ steps.configuration.outputs.path }}/${{ steps.configuration.outputs.filename }}
+          name: ${{ steps.configuration.outputs.artifact }}
+
+  parse:
+    needs:
+    - diff
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      type: ${{ steps.parse-request.outputs.type }}
+      submissions: ${{ steps.parse-request.outputs.submissions }}
+      index-entry: ${{ steps.parse-request.outputs.index-entry }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Download diff
+      uses: actions/download-artifact@v3
+      with:
+        path: ${{ needs.diff.outputs.path }}
+        name: ${{ needs.diff.outputs.artifact }}
+
+    - name: Remove no longer needed artifact from workflow
+      uses: geekyeggo/delete-artifact@v2
+      with:
+        name: ${{ needs.diff.outputs.artifact }}
+
+    - name: Parse request
+      id: parse-request
+      run: |
+        REQUEST="$( \
+          "python${{ env.PYTHON_VERSION }} pr_parser/pr_submission_parser.py" \
+            --diffpath="${{ needs.diff.outputs.path }}/${{ needs.diff.outputs.filename }}" \
+            --listpath="${{ env.LISTFILE_LOC }}" \
+        )"
+        echo "::set-output name=type::$(echo "$REQUEST" | jq -r -c '.type')"
+        echo "::set-output name=submissions::$(echo "$REQUEST" | jq -c '.submissions')"
+        echo "::set-output name=index-entry::$(echo "$REQUEST" | jq -r -c '.index_entry')"
+
+  merge:
+    needs:
+      - diff
+      - parse
+
+    if: >
+      needs.parse.outputs.type == 'submission'
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      pass: ${{ steps.merge.outcome == 'success' }}
+      status: ${{ steps.merge.outputs.status }}
+
+    steps:
+      - name: Approve pull request
+        uses: octokit/request-action@v2.x
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          route: POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
+          pull_number: ${{ github.event.pull_request.number }}${{ github.event.issue.number }}
+          event: APPROVE
+
+      - name: Merge pull request
+        id: merge
+        continue-on-error: true # Error in some situations (e.g., merge conflict) is expected
+        uses: octokit/request-action@v2.x
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          route: PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
+          pull_number: ${{ github.event.pull_request.number }}${{ github.event.issue.number }}
+          sha: ${{ needs.diff.outputs.head }}
+          merge_method: squash
+
+      - name: Add index source file entry for submissions
+        if: steps.merge.outcome == 'success'
+        run: |
+          git config --global user.email "TODO@TODO.TODO"
+          git config --global user.name "TODO TODO"
+          echo "${{ needs.parse.outputs.index-entry }}" >> "${{ env.ACCEPTED_REPOSITORIES_LOC }}"
+          git add --update "${{ env.ACCEPTED_REPOSITORIES_LOC }}"
+          git commit -m "Add submission ${{ github.event.pull_request.number }}${{ github.event.issue.number }}\n\n${{ github.event.repository.html_url }}/pull/${{ github.event.pull_request.number }}${{ github.event.issue.number }}"
+          git push
+
+      - name: Comment that submission was accepted
+        if: steps.merge.outcome == 'success'
+        uses: octokit/request-action@v2.x
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          route: POST /repos/{owner}/{repo}/issues/{issue_number}/comments
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
+          issue_number: ${{ github.event.pull_request.number }}${{ github.event.issue.number }}
+          body: |
+            |
+            Your submission has now been accepted! Thanks for your contribution to the OpenSCAD Library Manager index.
