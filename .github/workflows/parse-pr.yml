@@ -3,8 +3,8 @@ name: Automatically handle new library submissions
 env:
   # See: https://github.com/actions/setup-python/tree/main#available-versions-of-python
   PYTHON_VERSION: "3.12"
-  LISTFILE_LOC: "output_files/list_file.txt"
-  ACCEPTED_REPOSITORIES_LOC: "output_files/accepted_repositories.txt"
+  LISTFILE_LOC: "${{ github.workspace }}/output_files/list_file.txt"
+  ACCEPTED_REPOSITORIES_LOC: "${{ github.workspace }}/output_files/accepted_repositories.txt"
 
 on:
   pull_request_target:
@@ -115,7 +115,7 @@ jobs:
       id: parse-request
       run: |
         REQUEST="$( \
-          "python${{ env.PYTHON_VERSION }} pr_parser/pr_submission_parser.py" \
+          python${{ env.PYTHON_VERSION }} "${{ github.workspace }}/pr_parser/pr_submission_parser.py" \
             --diffpath="${{ needs.diff.outputs.path }}/${{ needs.diff.outputs.filename }}" \
             --listpath="${{ env.LISTFILE_LOC }}" \
         )"
