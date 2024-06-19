@@ -119,16 +119,16 @@ jobs:
     - name: Parse request
       id: parse-request
       run: |
-        REQUEST="$( \
-          python${{ env.PYTHON_VERSION }} -u "${{ github.workspace }}/pr_parser/pr_submission_parser.py" \
-            --diffpath="${{ needs.diff.outputs.path }}/${{ needs.diff.outputs.filename }}" \
-            --listpath="${{ env.LISTFILE_LOC }}" \
-            2>&1 \
-        )"
-        echo "$REQUEST"
-        echo "::set-output name=type::$(echo "$REQUEST" | jq -r -c '.type')"
-        echo "::set-output name=submissions::$(echo "$REQUEST" | jq -c '.submissions')"
-        echo "::set-output name=index-entry::$(echo "$REQUEST" | jq -r -c '.index_entry')"
+        python${{ env.PYTHON_VERSION }} -u "${{ github.workspace }}/pr_parser/pr_submission_parser.py" \
+          --diffpath="${{ needs.diff.outputs.path }}/${{ needs.diff.outputs.filename }}" \
+          --listpath="${{ env.LISTFILE_LOC }}" \
+          -v \
+          1>${{ runner.temp }}/pr_parser_output.txt \
+          2>${{ runner.temp }}/pr_parser_log.txt
+        cat ${{ runner.temp }}/pr_parser_log.txt
+        echo "::set-output name=type::$(cat ${{ runner.temp }}/pr_parser_output.txt | jq -r -c '.type')"
+        echo "::set-output name=submissions::$(cat ${{ runner.temp }}/pr_parser_output.txt | jq -c '.submissions')"
+        echo "::set-output name=index-entry::$(cat ${{ runner.temp }}/pr_parser_output.txt | jq -r -c '.index_entry')"
 
   merge:
     needs:
