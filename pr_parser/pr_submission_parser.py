@@ -398,8 +398,8 @@ class SubmissionRequest:  # pull request
         #   to show in the acceptance message.
         logging.info("Creating index entry")
         self.index_entry = "\n".join(sub.index_entry for sub in self.submissions)
-        logging.debug("SubmissionRequest index_entry:")
-        logging.debug(Utils.indent(self.index_entry))
+        logging.info("SubmissionRequest index_entry:")
+        logging.info(Utils.indent(self.index_entry))
 
 
 def main() -> int:
