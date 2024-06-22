@@ -463,6 +463,7 @@ def main() -> int:
         with open(args.output, "a") as f:
             print(json_str, file=f)
 
+    logging.info("All Done")
     return 0
 
 
