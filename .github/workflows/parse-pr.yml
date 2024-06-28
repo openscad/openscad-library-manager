@@ -172,7 +172,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Add index source file entry for submissions
-        if: steps.merge.outcome == 'success'
         run: |
           git config --global user.email "TODO@TODO.TODO"
           git config --global user.name "TODO TODO"
@@ -182,7 +181,6 @@ jobs:
           git push
 
       - name: Comment that submission was accepted
-        if: steps.merge.outcome == 'success'
         uses: octokit/request-action@v2.x
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
