@@ -1,0 +1,82 @@
+name: Periodically generate the index file.
+
+env:
+  # See: https://github.com/actions/setup-python/tree/main#available-versions-of-python
+  PYTHON_VERSION: "3.12"
+  INDEX_GENERATOR_LOC: "${{ github.workspace }}/index_generator/index_generator.py"
+  ACCEPTED_REPOSITORIES_LOC: "${{ github.workspace }}/output_files/accepted_repositories.txt"
+  INDEX_FILE_LOC: "${{ github.workspace }}/output_files/index_file.json"
+  INDEX_FILE_NAME: "index_file.json"
+
+on:
+  schedule:
+    - cron: "30 * * * *"
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    outputs:
+      artifact: ${{ steps.configuration.outputs.artifact }}
+      path: ${{ steps.configuration.outputs.path }}
+      filename: ${{ steps.configuration.outputs.filename }}
+
+    steps:
+      - name: Set configuration outputs
+        id: configuration
+        run: |
+          echo "::set-output name=artifact::${{ env.INDEX_FILE_NAME }}"
+          echo "::set-output name=path::${{ runner.temp }}"
+          echo "::set-output name=filename::${{ env.INDEX_FILE_NAME }}"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Python Packages
+        run: |
+          python${{ env.PYTHON_VERSION }} -m pip install --upgrade pip
+          python${{ env.PYTHON_VERSION }} -m pip install -r "${{ github.workspace }}/index_generator/requirements.txt"
+
+      - name: Generate index
+        run: |
+          python${{ env.PYTHON_VERSION }} -u ${{ env.INDEX_GENERATOR_LOC }} \
+            --accepted-repositories ${{ env.ACCEPTED_REPOSITORIES_LOC }} \
+            --output ${{ steps.configuration.outputs.path }}/${{ steps.configuration.outputs.filename }} \
+            -v \
+          cat ${{ steps.configuration.outputs.path }}/${{ steps.configuration.outputs.filename }}
+
+      - name: Upload index file to workflow artifact
+        uses: actions/upload-artifact@v3
+        with:
+          path: ${{ steps.configuration.outputs.path }}/${{ steps.configuration.outputs.filename }}
+          name: ${{ steps.configuration.outputs.artifact }}
+
+  update:
+    needs:
+      - generate
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download index
+        uses: actions/download-artifact@v3
+        with:
+          path: ${{ needs.generate.outputs.path }}
+          name: ${{ needs.generate.outputs.artifact }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Add index file to repo
+        run: |
+          git config --global user.email "TODO@TODO.TODO"
+          git config --global user.name "TODO TODO"
+          cat "${{ needs.generate.outputs.path }}/${{ needs.generate.outputs.filename }}" > "${{ env.INDEX_FILE_LOC }}"
+          git add --update "${{ env.INDEX_FILE_LOC }}"
+          git commit -m "Updated index ${{ github.run_id }}"
+          git push
