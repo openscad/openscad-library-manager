@@ -14,6 +14,7 @@ ACCEPTED_REPOSITORIES_FILENAME = "accepted_repositories.txt"
 INDEX_FILENAME = "index_file.json"
 MANIFEST_FILENAME = "manifest.toml"
 INDEX_SOURCE_SEPARATOR = "||"
+RECORD_SEP = ", "
 
 DEFAULT_VERBOSITY_LEVEL = 0
 VERBOSITY_LEVELS = [
@@ -30,9 +31,9 @@ class Utils:
         exit(1)
 
     @staticmethod
-    def remove_last_character(f_name: PathLike):
+    def remove_last_character(f_name: PathLike, n: int = 1):
         with open(f_name, "rb+") as f:
-            f.seek(-1, SEEK_END)
+            f.seek(-n, SEEK_END)
             f.truncate()
 
 
@@ -100,7 +101,7 @@ def process_repo(repo_url: str, lib_name: str) -> list:
 
             # Add to list
             logging.info("Adding library to list")
-            record = json.dumps(manifest_data["library"]) + ", "
+            record = json.dumps(manifest_data["library"]) + RECORD_SEP
             entries.append(record)
 
     logger.debug("entries:")
@@ -195,7 +196,7 @@ def main():
             )
             future.add_done_callback(lambda x: write_output(x.result()))
 
-    Utils.remove_last_character(index_file_path)
+    Utils.remove_last_character(index_file_path, len(RECORD_SEP))
     write_output("]}")
 
 
