@@ -9,8 +9,8 @@ env:
   INDEX_FILE_NAME: "index_file.json"
 
 on:
-  schedule:
-    - cron: "30 * * * *"
+  # schedule:
+  #   - cron: "30 * * * *"
 
   workflow_dispatch:
 
