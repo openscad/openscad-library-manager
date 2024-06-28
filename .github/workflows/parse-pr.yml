@@ -168,6 +168,9 @@ jobs:
           sha: ${{ needs.diff.outputs.head }}
           merge_method: squash
 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Add index source file entry for submissions
         if: steps.merge.outcome == 'success'
         run: |
