@@ -47,7 +47,7 @@ jobs:
           python${{ env.PYTHON_VERSION }} -u ${{ env.INDEX_GENERATOR_LOC }} \
             --accepted-repositories ${{ env.ACCEPTED_REPOSITORIES_LOC }} \
             --output ${{ steps.configuration.outputs.path }}/${{ steps.configuration.outputs.filename }} \
-            -v \
+            -v
           cat ${{ steps.configuration.outputs.path }}/${{ steps.configuration.outputs.filename }}
 
       - name: Upload index file to workflow artifact
