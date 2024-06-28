@@ -87,7 +87,7 @@ def process_repo(repo_url: str, lib_name: str) -> list:
                 # error_exit("mismatch")
 
             # Add to list
-            record = json.dumps(manifest_data["library"]) + ",\n"
+            record = json.dumps(manifest_data["library"]) + ","
             entries.append(record)
 
     return entries
@@ -152,8 +152,7 @@ def main():
             l.release()
 
     with open(index_file_path, "w") as f_index:
-        f_index.write('{"libraries":[\n')
-    # write_output('{"libraries":[\n')
+        f_index.write('{"libraries":[')
 
     with ppe(args.jobs) as p, open(accepted_repositories_path, "r") as f_arp:
         while line := f_arp.readline():
@@ -172,16 +171,8 @@ def main():
             )
             future.add_done_callback(lambda x: write_output(x.result()))
 
-            # entries = process_repo(repo_url, lib_type, lib_name)
-
-            # with open(index_file_path, "a") as f_index:
-            #     f_index.writelines(entries)
-
-    # with open(index_file_path, "a") as f_index:
-    #     f_index.write("]}\n")
     remove_last_character(index_file_path)
-    remove_last_character(index_file_path)
-    write_output("]}\n")
+    write_output("]}")
 
 
 if __name__ == "__main__":
