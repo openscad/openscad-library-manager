@@ -123,9 +123,9 @@ jobs:
           --diffpath="${{ needs.diff.outputs.path }}/${{ needs.diff.outputs.filename }}" \
           --listpath="${{ env.LISTFILE_LOC }}" \
           -v > ${{ runner.temp }}/pr_parser_output.json
-        echo "::set-output name=type::$(cat ${{ runner.temp }}/pr_parser_output.json | jq -r -c '.type')"
-        echo "::set-output name=submissions::$(cat ${{ runner.temp }}/pr_parser_output.json | jq -r -c '.submissions')"
-        echo "::set-output name=index-entry::$(cat ${{ runner.temp }}/pr_parser_output.json | jq -r -c '.index_entry')"
+        echo "::set-output name=type::$(cat ${{ runner.temp }}/pr_parser_output.json | jq --unbuffered -r -c '.type')"
+        echo "::set-output name=submissions::$(cat ${{ runner.temp }}/pr_parser_output.json | jq --unbuffered -r -c '.submissions')"
+        echo "::set-output name=index-entry::$(cat ${{ runner.temp }}/pr_parser_output.json | jq --unbuffered -r -c '.index_entry')"
         cat ${{ runner.temp }}/pr_parser_output.json
 
   merge:
