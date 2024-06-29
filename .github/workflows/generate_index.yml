@@ -27,9 +27,9 @@ jobs:
       - name: Set configuration outputs
         id: configuration
         run: |
-          echo "::set-output name=artifact::${{ env.INDEX_FILE_NAME }}"
-          echo "::set-output name=path::${{ runner.temp }}"
-          echo "::set-output name=filename::${{ env.INDEX_FILE_NAME }}"
+          echo "artifact=${{ env.INDEX_FILE_NAME }}" >> $GITHUB_OUTPUT
+          echo "path=${{ runner.temp }}" >> $GITHUB_OUTPUT
+          echo "filename=${{ env.INDEX_FILE_NAME }}" >> $GITHUB_OUTPUT
 
       - name: Checkout repository
         uses: actions/checkout@v4

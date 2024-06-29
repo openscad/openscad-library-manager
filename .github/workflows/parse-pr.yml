@@ -49,9 +49,9 @@ jobs:
       - name: Set configuration outputs
         id: configuration
         run: |
-          echo "::set-output name=artifact::diff"
-          echo "::set-output name=path::${{ runner.temp }}"
-          echo "::set-output name=filename::${{ env.DIFF_IDENTIFIER }}"
+          echo "artifact=diff" >> $GITHUB_OUTPUT
+          echo "path=${{ runner.temp }}" >> $GITHUB_OUTPUT
+          echo "filename=${{ env.DIFF_IDENTIFIER }}" >> $GITHUB_OUTPUT
 
       - name: Get PR data
         env:
@@ -72,7 +72,8 @@ jobs:
 
       - name: Get head SHA of diff
         id: head
-        run: echo "::set-output name=head::$(jq -c .head.sha "${{ steps.configuration.outputs.path }}/${{ env.JSON_IDENTIFIER }}")"
+        run: |
+          echo "head=$(jq -c .head.sha "${{ steps.configuration.outputs.path }}/${{ env.JSON_IDENTIFIER }}")" >> $GITHUB_OUTPUT
 
       - name: Upload diff file to workflow artifact
         uses: actions/upload-artifact@v3
@@ -123,9 +124,9 @@ jobs:
           --diffpath="${{ needs.diff.outputs.path }}/${{ needs.diff.outputs.filename }}" \
           --listpath="${{ env.LISTFILE_LOC }}" \
           -v > ${{ runner.temp }}/pr_parser_output.json
-        echo "::set-output name=type::$(cat ${{ runner.temp }}/pr_parser_output.json | jq --unbuffered -r -c '.type')"
-        echo "::set-output name=submissions::$(cat ${{ runner.temp }}/pr_parser_output.json | jq --unbuffered -r -c '.submissions')"
-        echo "::set-output name=index-entry::$(cat ${{ runner.temp }}/pr_parser_output.json | jq --unbuffered -r -c '.index_entry')"
+        echo "type=$(cat ${{ runner.temp }}/pr_parser_output.json | jq --unbuffered -r -c '.type')" >> $GITHUB_OUTPUT
+        echo "submissions=$(cat ${{ runner.temp }}/pr_parser_output.json | jq --unbuffered -r -c '.submissions')" >> $GITHUB_OUTPUT
+        echo "index-entry=$(cat ${{ runner.temp }}/pr_parser_output.json | jq --unbuffered -r -c '.index_entry')" >> $GITHUB_OUTPUT
         cat ${{ runner.temp }}/pr_parser_output.json
 
   merge:
