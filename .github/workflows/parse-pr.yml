@@ -175,6 +175,8 @@ jobs:
         run: |
           git config --global user.email "GitHubBot@OpenSCAD.org"
           git config --global user.name "GitHubBot OpenSCAD"
+          git pull
+          git reset --hard origin/main
           echo -e ${{ needs.parse.outputs.index-entry }} >> "${{ env.ACCEPTED_REPOSITORIES_LOC }}"
           git add --update "${{ env.ACCEPTED_REPOSITORIES_LOC }}"
           git commit -m "Add submission ${{ github.event.pull_request.number }} -- ${{ github.event.repository.html_url }}/pull/${{ github.event.pull_request.number }}"
