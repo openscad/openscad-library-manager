@@ -157,6 +157,17 @@ jobs:
           sha: ${{ needs.diff.outputs.head }}
           merge_method: squash
 
+  update:
+    needs:
+      - parse
+      - merge
+
+    if: >
+      needs.parse.outputs.type == 'addition'
+
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -166,7 +177,7 @@ jobs:
           git config --global user.name "GitHubBot OpenSCAD"
           echo -e ${{ needs.parse.outputs.index-entry }} >> "${{ env.ACCEPTED_REPOSITORIES_LOC }}"
           git add --update "${{ env.ACCEPTED_REPOSITORIES_LOC }}"
-          git commit -m "Add submission ${{ github.event.pull_request.number }}\n\n${{ github.event.repository.html_url }}/pull/${{ github.event.pull_request.number }}"
+          git commit -m "Add submission ${{ github.event.pull_request.number }} -- ${{ github.event.repository.html_url }}/pull/${{ github.event.pull_request.number }}"
           git push
 
       - name: Comment that submission was accepted
