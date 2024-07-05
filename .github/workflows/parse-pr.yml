@@ -49,9 +49,9 @@ jobs:
       - name: Set configuration outputs
         id: configuration
         run: |
-          echo "artifact=diff" >> $GITHUB_OUTPUT
-          echo "path=${{ runner.temp }}" >> $GITHUB_OUTPUT
-          echo "filename=${{ env.DIFF_IDENTIFIER }}" >> $GITHUB_OUTPUT
+          echo -E "artifact=diff" >> $GITHUB_OUTPUT
+          echo -E "path=${{ runner.temp }}" >> $GITHUB_OUTPUT
+          echo -E "filename=${{ env.DIFF_IDENTIFIER }}" >> $GITHUB_OUTPUT
 
       - name: Get PR data
         env:
@@ -73,7 +73,7 @@ jobs:
       - name: Get head SHA of diff
         id: head
         run: |
-          echo "head=$(jq -c .head.sha "${{ steps.configuration.outputs.path }}/${{ env.JSON_IDENTIFIER }}")" >> $GITHUB_OUTPUT
+          echo -E "head=$(jq -c .head.sha "${{ steps.configuration.outputs.path }}/${{ env.JSON_IDENTIFIER }}")" >> $GITHUB_OUTPUT
 
       - name: Upload diff file to workflow artifact
         uses: actions/upload-artifact@v3
@@ -124,9 +124,9 @@ jobs:
           --diffpath="${{ needs.diff.outputs.path }}/${{ needs.diff.outputs.filename }}" \
           --listpath="${{ env.LISTFILE_LOC }}" \
           -v > ${{ runner.temp }}/pr_parser_output.json
-        echo "type=$(cat ${{ runner.temp }}/pr_parser_output.json | jq --unbuffered -r -c '.type')" >> $GITHUB_OUTPUT
-        echo "submissions=$(cat ${{ runner.temp }}/pr_parser_output.json | jq --unbuffered -r -c '.submissions')" >> $GITHUB_OUTPUT
-        echo "index-entry=$(cat ${{ runner.temp }}/pr_parser_output.json | jq --unbuffered -r -c '.index_entry')" >> $GITHUB_OUTPUT
+        echo -E "type=$(cat ${{ runner.temp }}/pr_parser_output.json | jq --unbuffered -r -c '.type')" >> $GITHUB_OUTPUT
+        echo -E "submissions=$(cat ${{ runner.temp }}/pr_parser_output.json | jq --unbuffered -c '.submissions')" >> $GITHUB_OUTPUT
+        echo -E "index-entry=$(cat ${{ runner.temp }}/pr_parser_output.json | jq --unbuffered -c '.index_entry')" >> $GITHUB_OUTPUT
         cat ${{ runner.temp }}/pr_parser_output.json
 
   merge:
@@ -176,7 +176,7 @@ jobs:
         run: |
           git config --global user.email "GitHubBot@OpenSCAD.org"
           git config --global user.name "GitHubBot OpenSCAD"
-          echo "${{ needs.parse.outputs.index-entry }}" >> "${{ env.ACCEPTED_REPOSITORIES_LOC }}"
+          echo -e "${{ needs.parse.outputs.index-entry }}" >> "${{ env.ACCEPTED_REPOSITORIES_LOC }}"
           git add --update "${{ env.ACCEPTED_REPOSITORIES_LOC }}"
           git commit -m "Add submission ${{ github.event.pull_request.number }}${{ github.event.issue.number }}\n\n${{ github.event.repository.html_url }}/pull/${{ github.event.pull_request.number }}${{ github.event.issue.number }}"
           git push
