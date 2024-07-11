@@ -2,13 +2,11 @@ import argparse
 import json
 import logging
 import tempfile
+import time
 import tomllib
 from concurrent.futures import ProcessPoolExecutor as ppe
-from multiprocessing import Lock
-from os import SEEK_END, PathLike
 from pathlib import Path
 from subprocess import run
-from typing import Iterable
 
 ACCEPTED_REPOSITORIES_FILENAME = "accepted_repositories.txt"
 INDEX_FILENAME = "index_file.json"
@@ -29,12 +27,6 @@ class Utils:
     def error_exit(msg: str):
         logging.error(msg=msg)
         exit(1)
-
-    @staticmethod
-    def remove_last_character(f_name: PathLike, n: int = 1):
-        with open(f_name, "rb+") as f:
-            f.seek(-n, SEEK_END)
-            f.truncate()
 
 
 def process_repo(repo_url: str, lib_name: str) -> list:
@@ -101,8 +93,7 @@ def process_repo(repo_url: str, lib_name: str) -> list:
 
             # Add to list
             logging.info("Adding library to list")
-            record = json.dumps(manifest_data["library"]) + RECORD_SEP
-            entries.append(record)
+            entries.append(manifest_data)
 
     logger.debug("entries:")
     logger.debug(entries)
@@ -153,24 +144,7 @@ def main():
     logging.debug(f"{accepted_repositories_path = }")
     logging.debug(f"{index_file_path = }")
 
-    l = Lock()
-
-    def write_output(data: str | Iterable[str]):
-        l.acquire()
-
-        try:
-            with open(index_file_path, "a") as f_index:
-                if isinstance(data, str):
-                    f_index.write(data)
-                else:
-                    f_index.writelines(data)
-        finally:
-            l.release()
-
-    logging.debug("Adding first part to index file")
-    with open(index_file_path, "w") as f_index:
-        f_index.write('{"libraries":[')
-
+    records = []
     logging.debug("Creating process pool")
     logging.info("Opening accepted repositories file")
     with ppe(args.jobs) as p, open(accepted_repositories_path, "r") as f_arp:
@@ -194,10 +168,19 @@ def main():
                 repo_url=repo_url,
                 lib_name=lib_name,
             )
-            future.add_done_callback(lambda x: write_output(x.result()))
+            future.add_done_callback(lambda x: records.extend(x.result()))
 
-    Utils.remove_last_character(index_file_path, len(RECORD_SEP))
-    write_output("]}")
+    records.sort(key=lambda x: (x["library"]["name"], x["library"]["version"]))
+
+    with open(index_file_path, "w") as f:
+        json.dump(
+            {
+                "libraries": records,
+                "timestamp": time.time(),
+            },
+            f,
+            sort_keys=True,
+        )
 
 
 if __name__ == "__main__":
