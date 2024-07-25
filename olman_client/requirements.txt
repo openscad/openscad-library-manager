@@ -1,0 +1,2 @@
+pydantic
+libversion # requires manual installation of original libversion

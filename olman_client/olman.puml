@@ -1,0 +1,95 @@
+@startuml olman
+
+class MainAPI{
+    +update()
+    +install()
+    +remove()
+    +search()
+    +list()
+    ' ...
+}
+
+MainAPI::update -- RemoteIndexManager::update
+MainAPI::install --- InstallManager
+' MainAPI::install -- LocalIndexManager
+
+class RemoteIndexManager{
+    {static} -index_file_path: Path
+    -libraries: dict[str, list[Manifest]]
+
+    +RemoteIndexManager()
+    -download()
+    -load()
+    +update(force: bool = False)
+    +get(name:str, version: str | None = None)
+    +resolve(name: str, version: str)
+
+}
+
+RemoteIndexManager o-- Manifest
+
+class Manifest{
+    +manifest_version: str
+    +library: Library
+    +files: Files
+    +urls: Urls
+}
+
+Manifest *-- Library
+Manifest *-- Files
+Manifest *-- Urls
+
+class Library{
+    +name: str
+    +version: str
+    +dependencies: str
+    ...
+}
+
+class Files{
+    +scad: list[str]
+}
+
+class Urls{
+    repository: str
+    homepage: str
+    documentation: str
+}
+
+class LocalIndexManager{
+    -index_file_path: Path
+    -libraries: dict[str, InstalledLibrary]
+    +LocalIndexManager()
+    -load()
+    -dump()
+    +add(library: Manifest, location)
+    +remove(name: str)
+    +get(name: str)
+}
+
+LocalIndexManager o-- InstalledLibrary
+
+class InstalledLibrary{
+    manifest: Manifest
+    location: Path
+    date_added: datetime
+}
+
+InstalledLibrary *-- Manifest
+
+class InstallManager{
+    -rim: RemoteIndexManager
+    -lim: LocalIndexManager
+    +install(name: str, version: str)
+    +remove(name: str)
+}
+
+InstallManager *-- RemoteIndexManager
+InstallManager *-- LocalIndexManager
+
+class State{
+    lastUpdateTime
+}
+
+
+@enduml
