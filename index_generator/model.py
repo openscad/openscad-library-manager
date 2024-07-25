@@ -78,7 +78,9 @@ class Urls(BaseModel):
     documentation: Optional[str] = Field(
         default=None,
     )
-    # TODO: add preview images
+    preview_images: list[str] = Field(
+        default_factory=list,
+    )
 
 
 class Manifest(BaseModel):
@@ -86,9 +88,10 @@ class Manifest(BaseModel):
     library: Library = Field(
         REQUIRED,
     )
-    files: Files = Field(
-        REQUIRED,
-    )
+    # TODO: restore support
+    # files: Files = Field(
+    #     REQUIRED,
+    # )
     urls: Urls = Field(
         REQUIRED,
     )
