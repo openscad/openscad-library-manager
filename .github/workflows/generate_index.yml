@@ -76,8 +76,8 @@ jobs:
 
       - name: Add index file to repo
         run: |
-          git config --global user.email "TODO@TODO.TODO"
-          git config --global user.name "TODO TODO"
+          git config --global user.email "GitHubBot@OpenSCAD.org"
+          git config --global user.name "GitHubBot OpenSCAD"
           cat "${{ needs.generate.outputs.path }}/${{ needs.generate.outputs.filename }}" > "${{ env.INDEX_FILE_LOC }}"
           git add --update "${{ env.INDEX_FILE_LOC }}"
           git commit -m "Updated index ${{ github.run_id }}"
