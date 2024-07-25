@@ -181,7 +181,12 @@ def main():
             )
             future.add_done_callback(lambda x: records.extend(x.result()))
 
-    records.sort(key=lambda x: (x["library"]["name"], x["library"]["version"]))
+    records.sort(
+        key=lambda x: (
+            x["manifest"]["library"]["name"],
+            x["manifest"]["library"]["version"],
+        )
+    )
 
     with open(index_file_path, "w") as f:
         json.dump(
