@@ -6,7 +6,7 @@ from shutil import rmtree
 from typing import Callable, Hashable, Iterable
 from urllib.request import urlretrieve
 
-from libversion import version_compare2
+# from libversion import version_compare2
 
 _VERSION_EQUAL = 0
 _VERSION_LESS = -1
@@ -142,24 +142,24 @@ def extractFile(file: Path, dst_dir: Path) -> Path:
         raise ValueError("Unsupported file format")
 
 
-def version_eq(v1: str, v2: str) -> bool:
-    return version_compare2(v1, v2) == _VERSION_EQUAL
+# def version_eq(v1: str, v2: str) -> bool:
+#     return version_compare2(v1, v2) == _VERSION_EQUAL
 
 
-def version_lt(v1: str, v2: str) -> bool:
-    return version_compare2(v1, v2) == _VERSION_LESS
+# def version_lt(v1: str, v2: str) -> bool:
+#     return version_compare2(v1, v2) == _VERSION_LESS
 
 
-def version_gt(v1: str, v2: str) -> bool:
-    return version_compare2(v1, v2) == _VERSION_GREATER
+# def version_gt(v1: str, v2: str) -> bool:
+#     return version_compare2(v1, v2) == _VERSION_GREATER
 
 
-def version_le(v1: str, v2: str) -> bool:
-    return version_lt(v1, v2) or version_eq(v1, v2)
+# def version_le(v1: str, v2: str) -> bool:
+#     return version_lt(v1, v2) or version_eq(v1, v2)
 
 
-def version_ge(v1: str, v2: str) -> bool:
-    return version_gt(v1, v2) or version_eq(v1, v2)
+# def version_ge(v1: str, v2: str) -> bool:
+#     return version_gt(v1, v2) or version_eq(v1, v2)
 
 
 def bucket[

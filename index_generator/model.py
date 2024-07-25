@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Annotated, Optional
 
 from pydantic import BaseModel, Field, StringConstraints
-from pydantic.networks import AnyUrl
 
 REQUIRED = ...
 NonEmptyString = Annotated[str, StringConstraints(min_length=1)]
