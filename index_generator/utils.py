@@ -31,7 +31,9 @@ def getFileDownloadLink(repo_url: str, file_path: str, branch: str = "main"):
     return download_link
 
 
-def getRepoZipLink(repo_link, branch="main", tag=None, sha=None):
+def getRepoZipLink(
+    repo_link: str, branch: str = "main", tag: str | None = None, sha: str | None = None
+):
     """
     Generate a GitHub repository download link as a zip file.
 
@@ -55,7 +57,8 @@ def getRepoZipLink(repo_link, branch="main", tag=None, sha=None):
     # Extract the username and repository name from the repo link
     if "github.com" in repo_parts:
         username = repo_parts[-2]
-        repo_name = repo_parts[-1].strip(".git")
+        repo_name = repo_parts[-1]
+        repo_name = repo_name[:-4] if repo_name.endswith(".git") else repo_name
 
         # Construct the zip file URL
         if tag:
