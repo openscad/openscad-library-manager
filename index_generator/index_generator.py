@@ -8,8 +8,11 @@ from concurrent.futures import ProcessPoolExecutor as ppe
 from pathlib import Path
 from subprocess import run
 
+import utils
+from model import Manifest
+
 ACCEPTED_REPOSITORIES_FILENAME = "accepted_repositories.txt"
-INDEX_FILENAME = "index_file.json"
+INDEX_FILENAME = "remote_index.json"
 MANIFEST_FILENAME = "manifest.toml"
 INDEX_SOURCE_SEPARATOR = "||"
 RECORD_SEP = ", "
@@ -59,6 +62,8 @@ def process_repo(repo_url: str, lib_name: str) -> list:
             check=True,
         )
 
+        # get tag name from here
+        # 60a7d86cb43d087855dd001c547ed1f82f617387 refs/tags/1.0.0
         tag_shas = [
             commit_tag.split()[0] for commit_tag in proc.stdout.strip().split("\n")
         ]
@@ -82,18 +87,24 @@ def process_repo(repo_url: str, lib_name: str) -> list:
                 manifest_data = tomllib.load(f)
 
             # Validate all fields
-            # TODO: validate manifest here
+            manifest = Manifest(**manifest_data)
 
             # Check name
             logger.info("Checking name")
-            if manifest_data["library"]["name"] != lib_name:
+            if manifest.library.name != lib_name:
                 logging.warning(f"tag {tag_sha} in {repo_url} contains invalid name")
                 continue
-                # error_exit("mismatch")
+
+            # TODO: check if tag name matches version
 
             # Add to list
             logging.info("Adding library to list")
-            entries.append(manifest_data)
+            entries.append(
+                {
+                    "manifest": manifest.model_dump(),
+                    "download_link": utils.getRepoZipLink(repo_url, sha=tag_sha),
+                }
+            )
 
     logger.debug("entries:")
     logger.debug(entries)
