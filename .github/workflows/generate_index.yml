@@ -5,8 +5,8 @@ env:
   PYTHON_VERSION: "3.12"
   INDEX_GENERATOR_LOC: "${{ github.workspace }}/index_generator/index_generator.py"
   ACCEPTED_REPOSITORIES_LOC: "${{ github.workspace }}/output_files/accepted_repositories.txt"
-  INDEX_FILE_LOC: "${{ github.workspace }}/output_files/index_file.json"
-  INDEX_FILE_NAME: "index_file.json"
+  INDEX_FILE_LOC: "${{ github.workspace }}/output_files/remote_index.json"
+  INDEX_FILE_NAME: "remote_index.json"
 
 on:
   # schedule:
