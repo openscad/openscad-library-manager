@@ -7,8 +7,8 @@ dependencies = ["dep1/2.4.6", "dep2/3.5.7"]
 short_description = "" # less than 120 characters
 long_description = ""
 authors = [
-    { name = 'dev name', emai = 'dev.name@email.com' },
-    { name = 'another dev', emai = 'another.dev@email.com' },
+    { name = 'dev name', email = 'dev.name@email.com' },
+    { name = 'another dev', email = 'another.dev@email.com' },
 ]
 maintainers = [
     { name = 'some maintainer', email = 'smaintainer@email.com' },
@@ -19,10 +19,17 @@ readme = "README.md"
 license = { file = "license.txt", identifier = "Apache-2.0" }
 # license = { text = "MIT License" }
 
-[files]
-scad = ["path/to/file.scad", "glob/pattern/to/some/*files.scad"]
+# TODO: support this later
+# [files]
+# scad = ["path/to/file.scad", "glob/pattern/to/some/*files.scad"]
+# exclude = []
 
-[urls]
-repository = "github.com/github/example"
+[urls] # TODO: remove urls?
+repository = "github.com/user/repo_name"
 homepage = "example.com"
 documentation = "example.com"
+preview_images = [
+    "path/to/image1.png",
+    "path/to/image2.png",
+    "http://url/to/image.png",
+]
