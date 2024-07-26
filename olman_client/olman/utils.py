@@ -115,14 +115,17 @@ def extractZipFile(file: Path, dst_dir: Path) -> Path:
 
         f.extractall(dst_dir)
 
-        if len(dirs) == 1 and dirs[0] != file.stem:
-            new_name = dst_dir / file.stem
+    if len(dirs) == 1 and dirs[0] != file.stem:
+        new_name = dst_dir / file.stem
 
-            if new_name.exists():
-                rmtree(new_name)
+        if new_name.exists():
+            rmtree(new_name)
 
-            (dst_dir / dirs[0]).rename(new_name)
-            dst_dir = new_name
+        (dst_dir / dirs[0]).rename(new_name)
+        dst_dir = new_name
+
+    else:
+        dst_dir = dst_dir / file.stem
 
     return dst_dir
 
