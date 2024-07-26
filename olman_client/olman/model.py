@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Annotated, Optional
 
-from pydantic import BaseModel, Field, StringConstraints
+from pydantic import BaseModel, Field, StringConstraints, field_serializer
 from pydantic.networks import AnyUrl
 
 REQUIRED = ...
@@ -112,3 +112,7 @@ class LocalLibrary(BaseModel):
     date_added: datetime = Field(
         REQUIRED,
     )
+
+    @field_serializer("date_added")
+    def serialize_datetime(self, d: datetime, _info) -> float:
+        return d.timestamp()
