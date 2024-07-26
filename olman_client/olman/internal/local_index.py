@@ -1,88 +1,97 @@
-import fnmatch
 import json
-import shutil
+from collections import defaultdict
 from pathlib import Path
 from time import time
+from typing import Any
 
-from olman import model, state, utils
+from olman import utils
 from olman.files import platform
+from olman.model import LocalLibrary, Manifest
 
 INDEX_FILE_NAME = "local_index.json"
 
 
-class LocalIndex:
-    def __init__(self):
-        self._load()
+index_file_path = platform.getDataDir() / INDEX_FILE_NAME
 
-    @property
-    def index_file_path(self):
-        return platform.getDataDir() / INDEX_FILE_NAME
 
-    def _initialize(self, exist_ok=False):
-        idx_path = self.index_file_path
+def _initialize(exist_ok=False):
+    if not exist_ok and index_file_path.exists():
+        raise FileExistsError("Local index already exists")
 
-        if not exist_ok and idx_path.exists():
-            raise FileExistsError("Local index already exists")
+    index_file_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(index_file_path, "w") as f:
+        json.dump({"libraries": []}, f)
 
-        idx_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(idx_path, "w") as f:
-            json.dump({"libraries": []}, f)
 
-    def _load(self):
-        idx_path = self.index_file_path
+def _load() -> defaultdict[str, list[LocalLibrary]]:
+    if not index_file_path.exists():
+        _initialize()
 
-        if not idx_path.exists():
-            self._initialize()
+    with open(index_file_path, "r") as f:
+        data = json.load(f)
 
-        with open(idx_path, "r") as f:
-            data = json.load(f)
+    libraries = [LocalLibrary(**local_lib) for local_lib in data["libraries"]]
 
-        libraries = [model.LocalLibrary(**local_lib) for local_lib in data["libraries"]]
+    libraries = utils.bucket(
+        libraries,
+        key=lambda local_lib: local_lib.manifest.library.name,
+    )
 
-        self._libraries = utils.bucket(
-            libraries,
-            key=lambda local_lib: local_lib.manifest.library.name,
+    for v in libraries.values():
+        if len(v) > 1:
+            raise Exception("Local index is corrupted")
+
+    return libraries
+
+
+def _dump(libraries: defaultdict[str, list[LocalLibrary]]):
+    with open(index_file_path, "w") as f:
+        json.dump(
+            {
+                "libraries": [
+                    local_libs[0].model_dump() for local_libs in libraries.values()
+                ]
+            },
+            f,
         )
 
-        for k, v in self._libraries:
-            if len(v) > 1:
-                raise Exception("Local index is corrupted")
 
-    def _dump(self):
-        with open(self.index_file_path, "w") as f:
-            json.dump(
-                {
-                    "libraries": [
-                        local_libs[0].model_dump()
-                        for local_libs in self._libraries.values()
-                    ]
-                },
-                f,
-            )
+def add(manifest: Manifest, location: Path):
+    libraries = _load()
 
-    def add(self, manifest: model.Manifest, location: Path):
-        new_lib = model.LocalLibrary(
-            manifest=manifest,
-            location=location.as_posix(),
-            date_added=time(),
-        )
+    name = manifest.library.name
+    if len(libraries[name]) > 0:
+        raise Exception(f"{name} already exists and can not be added again")
 
-        if (name := new_lib.manifest.library.name) in self._libraries.keys():
-            raise Exception(f"{name} already exists and can not be added again")
+    new_lib = LocalLibrary(
+        manifest=manifest,
+        location=location.as_posix(),
+        date_added=time(),
+    )
 
-        self._libraries[name].append(new_lib)
+    libraries[name].append(new_lib)
 
-        self._dump()
+    _dump(libraries)
 
-    def remove(self, name: str):
-        self._libraries.pop(name, None)
 
-        self._dump()
+def remove(name: str):
+    libraries = _load()
 
-    def get(self, name: str) -> list[model.LocalLibrary]:
-        matches = self._libraries[name]
+    libraries.pop(name, None)
 
-        # if len(matches) != 1:
-        #     raise Exception(f"No installed library named {name}")
+    _dump(libraries)
 
-        return matches
+
+def get(name: str, *, default: Any = utils._sentinel) -> LocalLibrary:
+    libraries = _load()
+
+    matches = libraries[name]
+
+    if len(matches) == 0:
+        if default is utils._sentinel:
+            raise Exception(f"No installed library named {name}")
+        else:
+            return default
+
+    else:
+        return matches[0]

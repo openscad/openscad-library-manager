@@ -1,80 +1,78 @@
 import json
+from collections import defaultdict
 from time import time
+from typing import Any
 
-from olman import model, state, utils
+from olman import state, utils
 from olman.files import platform
+from olman.model import RemoteLibrary
 
 INDEX_FILE_NAME = "remote_index.json"
 INDEX_FILE_LINK = f"https://raw.githubusercontent.com/openscad/openscad-library-manager/main/output_files/{INDEX_FILE_NAME}"
 
 
-class RemoteIndex:
-    def __init__(self, update=False, load=True):
-        if update:
-            self.update()
+index_file_path = platform.getDataDir() / INDEX_FILE_NAME
 
-        if load:
-            self._load()
 
-    @property
-    def index_file_path(self):
-        return platform.getDataDir() / INDEX_FILE_NAME
+def _download():
+    index_file_path.parent.mkdir(parents=True, exist_ok=True)
 
-    def _download(self):
-        idx_path = self.index_file_path
+    utils.downloadFile(
+        url=INDEX_FILE_LINK,
+        dst=index_file_path,
+        exist_ok=True,
+    )
 
-        idx_path.parent.mkdir(parents=True, exist_ok=True)
 
-        utils.downloadFile(
-            url=INDEX_FILE_LINK,
-            dst=idx_path,
-        )
+def _load() -> defaultdict[str, list[RemoteLibrary]]:
+    if not index_file_path.exists():
+        _download()
 
-    def _load(self):
-        idx_path = self.index_file_path
+    with open(index_file_path, "r") as f:
+        data = json.load(f)
 
-        if not idx_path.exists():
-            self._download()
+    libraries = [RemoteLibrary(**remote_lib) for remote_lib in data["libraries"]]
 
-        with open(idx_path, "r") as f:
-            data = json.load(f)
+    _libraries = utils.bucket(
+        libraries,
+        key=lambda remote_lib: remote_lib.manifest.library.name,
+    )
 
-        libraries = [
-            model.RemoteLibrary(**remote_lib) for remote_lib in data["libraries"]
-        ]
+    return _libraries
 
-        self._libraries = utils.bucket(
-            libraries,
-            key=lambda remote_lib: remote_lib.manifest.library.name,
-        )
 
-    def update(self, force: bool = False) -> bool:
-        threshold = 4 * 3600  # 4 hours
-        dt = state.lastUpdateTime()
-        index_file_path = platform.getDataDir() / INDEX_FILE_NAME
+def update(force: bool = False) -> bool:
+    threshold = 4 * 3600  # 4 hours
+    dt = state.lastUpdateTime()
+    index_file_path = platform.getDataDir() / INDEX_FILE_NAME
 
-        if force or dt >= threshold or not index_file_path.exists():
-            self._download()
+    if force or dt >= threshold or not index_file_path.exists():
+        _download()
 
-            state.State.set("last-update", int(time()))
+        state.State.set("last-update", int(time()))
 
-            return True
+        return True
 
-        return False
+    return False
 
-    def get(self, name: str, version: str | None = None) -> list[model.RemoteLibrary]:
-        # version= >=2.5
-        # version= latest
-        if version is None or version in ["*", "all"]:
-            return self._libraries[name]
 
-        if version in ["any", "latest"]:
-            return self._libraries[name][-1:]
+def get(
+    name: str, version_exact: str, *, default: Any = utils._sentinel
+) -> RemoteLibrary:
+    libraries = _load()
 
-        # TODO: implement version comparison first
-        # check if constrained or not
-        if "0" <= version[0] <= "9":
-            pass
+    matches = libraries[name]
 
-        # process
-        pass
+    for remote_lib in matches:
+        if utils.version_eq(remote_lib.manifest.library.version, version_exact):
+            return remote_lib
+
+    if default is utils._sentinel:
+        raise ValueError(f"Library {name}:{version_exact} not found")
+
+    else:
+        return default
+
+
+def search(name: str, version: str) -> list[RemoteLibrary]:
+    pass
