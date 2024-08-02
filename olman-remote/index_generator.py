@@ -8,8 +8,8 @@ from concurrent.futures import ProcessPoolExecutor as ppe
 from pathlib import Path
 from subprocess import run
 
-import utils
-from model import Manifest
+from olman_models import Manifest
+from olman_vcs_utils import getRepoZipLink
 
 ACCEPTED_REPOSITORIES_FILENAME = "accepted_repositories.txt"
 INDEX_FILENAME = "remote_index.json"
@@ -102,7 +102,7 @@ def process_repo(repo_url: str, lib_name: str) -> list:
             entries.append(
                 {
                     "manifest": manifest.model_dump(),
-                    "download_link": utils.getRepoZipLink(repo_url, sha=tag_sha),
+                    "download_link": getRepoZipLink(repo_url, sha=tag_sha),
                 }
             )
 
@@ -181,6 +181,7 @@ def main():
             )
             future.add_done_callback(lambda x: records.extend(x.result()))
 
+    # TODO: correctly sort versions with libversion
     records.sort(
         key=lambda x: (
             x["manifest"]["library"]["name"],

@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "olman-version-utils"
+version = "0.1.0"
+description = ""
+authors = ["Jack OAT <jack.oat29@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+libversion = "^1.2.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

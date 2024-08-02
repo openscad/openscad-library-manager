@@ -394,6 +394,8 @@ class SubmissionRequest:  # pull request
                 )
             url2name[sub.normalized_url] = sub.name
 
+        # TODO: Check for duplicates with existing repositories
+
         # Assemble the list of Library Manager indexer logs URLs for the submissions
         #   to show in the acceptance message.
         logging.info("Creating index entry")

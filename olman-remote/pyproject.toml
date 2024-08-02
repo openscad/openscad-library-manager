@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "olman-remote"
+version = "0.1.0"
+description = ""
+authors = ["Jack OAT <jack.oat29@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+olman-models = {path = "../olman-models"}
+olman-vcs-utils = {path = "../olman-vcs-utils"}
+requests = "^2.32.3"
+unidiff = "^0.7.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+index_generator = "index_generator:main"
+pr_parser = "pr_parser:main"
