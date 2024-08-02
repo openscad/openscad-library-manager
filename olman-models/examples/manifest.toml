@@ -3,7 +3,6 @@ manifest_version = "0.0.0-alpha"
 [library]
 name = "library_name"
 version = "1.2.3"
-dependencies = ["dep1/2.4.6", "dep2/3.5.7"]
 short_description = "" # less than 120 characters
 long_description = ""
 authors = [
@@ -18,6 +17,10 @@ tags = ['tag', 'another-tag']
 readme = "README.md"
 license = { file = "license.txt", identifier = "Apache-2.0" }
 # license = { text = "MIT License" }
+
+[dependencies]
+dep_name1 = "x.y.z"
+dep_name2 = "x.y.z"
 
 # TODO: support this later
 # [files]
