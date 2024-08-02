@@ -14,6 +14,10 @@ INDEX_FILE_LINK = f"https://raw.githubusercontent.com/openscad/openscad-library-
 index_file_path = platform.getDataDir() / INDEX_FILE_NAME
 
 
+class _sentinel:
+    pass
+
+
 def _download():
     index_file_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -26,7 +30,8 @@ def _download():
 
 def _load() -> defaultdict[str, list[RemoteLibrary]]:
     if not index_file_path.exists():
-        _download()
+        raise FileNotFoundError("Remote index doesn't exist. Did you update first?")
+        # update()
 
     with open(index_file_path, "r") as f:
         data = json.load(f)
@@ -56,9 +61,7 @@ def update(force: bool = False) -> bool:
     return False
 
 
-def get(
-    name: str, version_exact: str, *, default: Any = utils._sentinel
-) -> RemoteLibrary:
+def get(name: str, version_exact: str, *, default: Any = _sentinel) -> RemoteLibrary:
     libraries = _load()
 
     matches = libraries[name]
@@ -67,7 +70,7 @@ def get(
         if utils.version_eq(remote_lib.manifest.library.version, version_exact):
             return remote_lib
 
-    if default is utils._sentinel:
+    if default is _sentinel:
         raise ValueError(f"Library {name}:{version_exact} not found")
 
     else:

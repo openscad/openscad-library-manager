@@ -1,30 +1,22 @@
-import json
-import os
 import shutil
-from pathlib import Path
-from time import time
 
+from olman import graph, install_manager
 from olman.internal import local_index, remote_index
 
 
 def update(force: bool = False) -> bool:
     "Update the index."
 
-    return remote_index.RemoteIndex(load=False).update()
+    return remote_index.update(force=force)
 
 
-def install(name: str, version: str | None = None) -> bool:
+def install(name: str, version: str | None = None, *, force: bool = False) -> bool:
     "Install a library."
 
-    ri = remote_index.RemoteIndex()
-    li = local_index.LocalIndex()
+    dep_graph = graph.DependencyGraph.fromNameVersion(name, version)
 
-    # add library to queue
-    # while queue is not empty  <------
-    #   check if already installed    |
-    #     check if upgrade needed     |
-    #   download manifest             |
-    #   add dependencies to queue -----
+    for lib_name, lib_version in dep_graph.as_list():
+        install_manager.install(lib_name, lib_version, force=force)
 
 
 def remove(name: str) -> bool:
@@ -34,6 +26,8 @@ def remove(name: str) -> bool:
     lib = li.get(name)
 
     shutil.rmtree(lib.location)
+    # TODO: remove dependencies too?
+    # TODO: track and check if used by another library
 
     li.remove(name)
 
@@ -45,4 +39,9 @@ def search(name: str, version: str | None = None) -> list:
 
 def info(name: str, version: str | None = None) -> str:
     "Get library information"
-    pass
+    remote_lib = remote_index.get(name, version)
+
+    short_description = remote_lib.manifest.library.short_description
+    long_description = remote_lib.manifest.library.long_description
+
+    return f"{short_description}\n\n{long_description}"

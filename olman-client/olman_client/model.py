@@ -2,10 +2,9 @@ from datetime import datetime
 from typing import Annotated, Optional
 
 from pydantic import BaseModel, Field, StringConstraints, field_serializer
-from pydantic.networks import AnyUrl
 
 REQUIRED = ...
-NonEmptyString = Annotated[str, StringConstraints(min_length=1)]
+type NonEmptyString = Annotated[str, StringConstraints(min_length=1)]
 
 
 class Person(BaseModel):
@@ -35,9 +34,6 @@ class Library(BaseModel):
     )
     version: NonEmptyString = Field(
         REQUIRED,
-    )
-    dependencies: list[NonEmptyString] = Field(
-        default_factory=list,
     )
     short_description: str = Field(  # limited to 100 char
         default="",
@@ -87,6 +83,9 @@ class Manifest(BaseModel):
     manifest_version: str
     library: Library = Field(
         REQUIRED,
+    )
+    dependencies: dict[str, str] = Field(
+        default_factory=dict,
     )
     # TODO: restore support
     # files: Files = Field(

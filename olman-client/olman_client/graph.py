@@ -1,51 +1,64 @@
-from collections import defaultdict, deque
+from collections import deque
 
-from olman.internal import local_index, remote_index
-from olman.model import LocalLibrary, Manifest
+from olman import utils
+from olman.internal import remote_index
+from olman.model import RemoteLibrary
 
-
-class Node:
-    def __init__(self) -> None:
-        pass
+type Node = tuple[str, str]
 
 
 class DependencyGraph:
+    _root: Node
+    _members: dict[str, str]
+
+    def __init__(self) -> None:
+        self._members = {}
+
     @staticmethod
-    def fromNameVersion(name: str, version: str) -> "DependencyGraph":
-        ri = remote_index.RemoteIndex()
-        li = local_index.LocalIndex()
+    def fromNameVersion(root_name: str, root_version_exact: str) -> "DependencyGraph":
+        graph = DependencyGraph()
+        graph._root = (root_name, root_version_exact)
 
-        node_version = defaultdict(
-            lambda _: None
-        )  # TODO: default should be installed version
-        node_visited = defaultdict(False)
-
-        q = deque()
-        q.append((name, version))
+        q: deque[Node] = deque()
+        q.append(graph._root)
 
         while len(q) != 0:
-            name, version = q.popleft()
+            curr_node = q.popleft()
 
-            if node_version[name] is None:
-                version = version_resolve(
-                    version
-                )  # if installed -> use installed || else -> use latest in remote
-                node_version[name] = version
-
-            else:
-                if not version_match(version, node_version[name]):
-                    raise Exception(
-                        "Version mismatch (conflicting dependency versions.)"
-                    )
-
-            if node_visited[name]:
+            if graph.add(curr_node) == False:
                 continue
 
-            node_visited[name] = True
+            remote_lib = remote_index.get(*curr_node)
 
-            manifest: Manifest = ri.get(name, version)
+            for dep_ref in remote_lib.manifest.library.dependencies:
+                dep_node = utils.dep_ref_split(dep_ref)
 
-            for dep_ref in manifest.library.dependencies:
-                dep_name, dep_version = version_split(dep_ref)
+                q.append(dep_node)
 
-                q.append((dep_name, dep_version))
+        return graph
+
+    def as_list(self) -> list[RemoteLibrary]:
+        # RFE: implement another `get` that returns the full list to avoid
+        #      loading, validating, and bucketing multiple times
+        # return [
+        #     remote_index.get(name, version) for name, version in self._members.items()
+        # ]
+        return [(name, version) for name, version in self._members.items()]
+
+    def add(self, node: Node) -> bool:
+        name, version = node
+
+        if name not in self._members.keys():
+            self._members[name] = version
+            return True
+
+        elif utils.version_eq(version, self._members[name]):
+            return False
+
+        else:
+            raise Exception(
+                f"Can't add node ({name}) to the graph due to version mismatch: {version} and {self._members[name]}"
+            )
+
+    def install(self) -> None:
+        pass

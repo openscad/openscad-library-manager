@@ -14,6 +14,10 @@ INDEX_FILE_NAME = "local_index.json"
 index_file_path = platform.getDataDir() / INDEX_FILE_NAME
 
 
+class _sentinel:
+    pass
+
+
 def _initialize(exist_ok=False):
     if not exist_ok and index_file_path.exists():
         raise FileExistsError("Local index already exists")
@@ -82,13 +86,13 @@ def remove(name: str):
     _dump(libraries)
 
 
-def get(name: str, *, default: Any = utils._sentinel) -> LocalLibrary:
+def get(name: str, *, default: Any = _sentinel) -> LocalLibrary:
     libraries = _load()
 
     matches = libraries[name]
 
     if len(matches) == 0:
-        if default is utils._sentinel:
+        if default is _sentinel:
             raise Exception(f"No installed library named {name}")
         else:
             return default

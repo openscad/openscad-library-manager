@@ -1,7 +1,7 @@
 import json
 from time import time
 
-from olman.files.platform import getCacheDir
+from olman_client.files.platform import getCacheDir
 
 STATE_FILE_NAME = "state_file.json"
 
@@ -20,7 +20,9 @@ class State:
     @staticmethod
     def _get_state() -> dict:
         if not State.CACHE_PATH.exists():
-            with State.CACHE_PATH.open("w") as f:
+            State.CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+            with open(State.CACHE_PATH, "w") as f:
                 f.write("{}")
 
         with open(State.CACHE_PATH, "r") as f:
