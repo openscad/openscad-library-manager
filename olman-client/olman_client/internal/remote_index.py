@@ -3,9 +3,10 @@ from collections import defaultdict
 from time import time
 from typing import Any
 
-from olman import state, utils
-from olman.files import platform
-from olman.model import RemoteLibrary
+from olman_models import RemoteLibrary
+
+from olman_client import state, utils
+from olman_client.files import platform
 
 INDEX_FILE_NAME = "remote_index.json"
 INDEX_FILE_LINK = f"https://raw.githubusercontent.com/openscad/openscad-library-manager/main/output_files/{INDEX_FILE_NAME}"

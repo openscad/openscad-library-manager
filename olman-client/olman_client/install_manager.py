@@ -1,8 +1,8 @@
 from shutil import rmtree
 
-from olman import utils
-from olman.files.platform import getDataDir
-from olman.internal import local_index, remote_index
+from olman_client import utils
+from olman_client.files.platform import getDataDir
+from olman_client.internal import local_index, remote_index
 
 DOWNLOAD_LOCATION = getDataDir()
 INSTALL_LOCATION = getDataDir()

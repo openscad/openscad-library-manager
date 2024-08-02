@@ -4,9 +4,10 @@ from pathlib import Path
 from time import time
 from typing import Any
 
-from olman import utils
-from olman.files import platform
-from olman.model import LocalLibrary, Manifest
+from olman_models import LocalLibrary, Manifest
+
+from olman_client import utils
+from olman_client.files import platform
 
 INDEX_FILE_NAME = "local_index.json"
 

@@ -1,7 +1,7 @@
 import shutil
 
-from olman import graph, install_manager
-from olman.internal import local_index, remote_index
+from olman_client import graph, install_manager
+from olman_client.internal import local_index, remote_index
 
 
 def update(force: bool = False) -> bool:

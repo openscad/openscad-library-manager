@@ -1,8 +1,9 @@
 from collections import deque
 
-from olman import utils
-from olman.internal import remote_index
-from olman.model import RemoteLibrary
+from olman_models import RemoteLibrary
+
+from olman_client import utils
+from olman_client.internal import remote_index
 
 type Node = tuple[str, str]
 
