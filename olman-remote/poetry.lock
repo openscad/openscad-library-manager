@@ -133,6 +133,16 @@ files = [
 ]
 
 [[package]]
+name = "libversion"
+version = "1.2.4"
+description = "Python bindings for libversion"
+optional = false
+python-versions = "*"
+files = [
+    {file = "libversion-1.2.4.tar.gz", hash = "sha256:1ce9112917a964cac7443b8a81553091f91051bec0a90635fd9c05afc7c9c087"},
+]
+
+[[package]]
 name = "olman-models"
 version = "0.1.0"
 description = ""
@@ -160,6 +170,22 @@ develop = false
 [package.source]
 type = "directory"
 url = "../olman-vcs-utils"
+
+[[package]]
+name = "olman-version-utils"
+version = "0.1.0"
+description = ""
+optional = false
+python-versions = "^3.12"
+files = []
+develop = false
+
+[package.dependencies]
+libversion = "^1.2.4"
+
+[package.source]
+type = "directory"
+url = "../olman-version-utils"
 
 [[package]]
 name = "pydantic"
@@ -347,4 +373,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "6fced50c97f55c4d937bdaa412234dcd5e321d71907820d6183d1850430ab001"
+content-hash = "56b7c2fee9ea4e82e76d6e216c84dc1a4c65c772afe7407ed5497becd0758190"

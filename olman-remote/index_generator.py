@@ -10,6 +10,7 @@ from subprocess import run
 
 from olman_models import Manifest
 from olman_vcs_utils import getRepoZipLink
+from olman_version_utils import version_key
 
 ACCEPTED_REPOSITORIES_FILENAME = "accepted_repositories.txt"
 INDEX_FILENAME = "remote_index.json"
@@ -185,7 +186,7 @@ def main():
     records.sort(
         key=lambda x: (
             x["manifest"]["library"]["name"],
-            x["manifest"]["library"]["version"],
+            version_key(x["manifest"]["library"]["version"]),
         )
     )
 

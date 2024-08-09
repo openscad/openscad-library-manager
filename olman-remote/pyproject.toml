@@ -11,6 +11,7 @@ olman-models = {path = "../olman-models"}
 olman-vcs-utils = {path = "../olman-vcs-utils"}
 requests = "^2.32.3"
 unidiff = "^0.7.5"
+olman-version-utils = {path = "../olman-version-utils"}
 
 
 [build-system]
