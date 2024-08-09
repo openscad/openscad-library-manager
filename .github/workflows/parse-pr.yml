@@ -166,6 +166,7 @@ jobs:
 
   update:
     needs:
+      - diff
       - parse
       - merge
 

@@ -47,7 +47,8 @@ jobs:
 
       - name: Install Libversion
         run: |
-          echo "deb [trusted=yes] https://download.opensuse.org/repositories/home:/t-paul:/libversion/xUbuntu_24.04/ ./" | sudo tee /etc/apt/sources.list.d/libversion.list
+          . /etc/lsb-release
+          echo "deb [trusted=yes] https://download.opensuse.org/repositories/home:/t-paul:/libversion/xUbuntu_$DISTRIB_RELEASE/ ./" | sudo tee /etc/apt/sources.list.d/libversion.list
           sudo apt update
           sudo apt install libversion3-dev
 
