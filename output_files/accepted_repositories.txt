@@ -1,3 +1,0 @@
-https://github.com/jackoat29/test_lib_1.git||test_lib_1
-https://github.com/jackoat29/test_lib_2.git||test_lib_2
-https://github.com/jackoat29/test_lib_3.git||test_lib_3
