@@ -3,7 +3,7 @@ name: Periodically generate the index file.
 env:
   # See: https://github.com/actions/setup-python/tree/main#available-versions-of-python
   PYTHON_VERSION: "3.12"
-  INDEX_GENERATOR_LOC: "${{ github.workspace }}/index_generator/index_generator.py"
+  INDEX_GENERATOR_LOC: "${{ github.workspace }}/olman-remote/index_generator.py"
   ACCEPTED_REPOSITORIES_LOC: "${{ github.workspace }}/output_files/accepted_repositories.txt"
   INDEX_FILE_LOC: "${{ github.workspace }}/output_files/remote_index.json"
   INDEX_FILE_NAME: "remote_index.json"
@@ -39,10 +39,21 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install Python Packages
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: false
+          virtualenvs-in-project: false
+
+      - name: Install Libversion
         run: |
-          python${{ env.PYTHON_VERSION }} -m pip install --upgrade pip
-          python${{ env.PYTHON_VERSION }} -m pip install -r "${{ github.workspace }}/index_generator/requirements.txt"
+          echo "deb [trusted=yes] https://download.opensuse.org/repositories/home:/t-paul:/libversion/xUbuntu_24.04/ ./" | sudo tee /etc/apt/sources.list.d/libversion.list
+          sudo apt update
+          sudo apt install libversion3-dev
+
+      - name: Install Dependencies
+        run: |
+          poetry install --directory="${{ github.workspace }}/olman-remote"
 
       - name: Generate index
         run: |

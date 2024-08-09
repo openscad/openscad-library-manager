@@ -89,10 +89,21 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
-    - name: Install Python Packages
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        virtualenvs-create: false
+        virtualenvs-in-project: false
+
+    - name: Install Libversion
       run: |
-        python${{ env.PYTHON_VERSION }} -m pip install --upgrade pip
-        python${{ env.PYTHON_VERSION }} -m pip install -r "${{ github.workspace }}/pr_parser/requirements.txt"
+        echo "deb [trusted=yes] https://download.opensuse.org/repositories/home:/t-paul:/libversion/xUbuntu_24.04/ ./" | sudo tee /etc/apt/sources.list.d/libversion.list
+        sudo apt update
+        sudo apt install libversion3-dev
+
+    - name: Install Dependencies
+      run: |
+        poetry install --directory="${{ github.workspace }}/olman-remote"
 
     - name: Download diff
       uses: actions/download-artifact@v3
@@ -100,15 +111,10 @@ jobs:
         path: ${{ needs.diff.outputs.path }}
         name: ${{ needs.diff.outputs.artifact }}
 
-    # - name: Remove no longer needed artifact from workflow
-    #   uses: geekyeggo/delete-artifact@v2
-    #   with:
-    #     name: ${{ needs.diff.outputs.artifact }}
-
     - name: Parse request
       id: parse-request
       run: |
-        python${{ env.PYTHON_VERSION }} -u "${{ github.workspace }}/pr_parser/pr_submission_parser.py" \
+        python${{ env.PYTHON_VERSION }} -u "${{ github.workspace }}/olman-remote/pr_parser.py" \
           --diffpath="${{ needs.diff.outputs.path }}/${{ needs.diff.outputs.filename }}" \
           --listpath="${{ env.LISTFILE_LOC }}" \
           -v > ${{ runner.temp }}/pr_parser_output.json
