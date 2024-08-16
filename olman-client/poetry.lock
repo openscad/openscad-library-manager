@@ -38,6 +38,19 @@ type = "directory"
 url = "../olman-models"
 
 [[package]]
+name = "olman-vcs-utils"
+version = "0.1.0"
+description = ""
+optional = false
+python-versions = "^3.12"
+files = []
+develop = false
+
+[package.source]
+type = "directory"
+url = "../olman-vcs-utils"
+
+[[package]]
 name = "olman-version-utils"
 version = "0.1.0"
 description = ""
@@ -190,4 +203,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "44ba60726280ed655b1d74de229b2c95ce3dade36a15f12c45afc57164e06add"
+content-hash = "d0b2b09604c7589a067d67c439bedba6474ac3381e2b49e24c9d72e6691a6faf"

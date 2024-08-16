@@ -5,6 +5,7 @@ from time import time
 from typing import Any
 
 from olman_models import LocalLibrary, Manifest
+from olman_version_utils import version_filter
 
 from olman_client import utils
 from olman_client.files import platform
@@ -100,3 +101,22 @@ def get(name: str, *, default: Any = _sentinel) -> LocalLibrary:
 
     else:
         return matches[0]
+
+
+def search(name: str, constraint: str) -> list[LocalLibrary]:
+    libraries = _load()
+
+    if name not in libraries:
+        return []
+
+    available_versions = libraries[name]
+    filtered_versions = [
+        x
+        for x in version_filter(
+            constraint,
+            available_versions,
+            key=lambda x: x.manifest.library.version,
+        )
+    ]
+
+    return list(reversed(filtered_versions))

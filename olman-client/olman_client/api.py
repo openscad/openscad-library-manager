@@ -21,22 +21,28 @@ def install(name: str, version: str | None = None, *, force: bool = False) -> bo
 
 def remove(name: str) -> bool:
     "Remove an installed library. Supports regex and/or glob?"
-    li = local_index.LocalIndex()
-
-    lib = li.get(name)
+    lib = local_index.get(name)
 
     shutil.rmtree(lib.location)
     # TODO: remove dependencies too?
     # TODO: track and check if used by another library
 
-    li.remove(name)
+    local_index.remove(name)
 
 
-def search(name: str, version: str | None = None) -> list:
+# TODO: implement "list" to return all versions of a library
+
+
+def search(name: str, constraint: str | None = None) -> list:
     "Search for libraries in the index. Supports regex and/or glob?"
-    pass
+    matches = remote_index.search(name, constraint)
+
+    return [
+        (lib.manifest.library.name, lib.manifest.library.version) for lib in matches
+    ]
 
 
+# TODO: return json?
 def info(name: str, version: str | None = None) -> str:
     "Get library information"
     remote_lib = remote_index.get(name, version)

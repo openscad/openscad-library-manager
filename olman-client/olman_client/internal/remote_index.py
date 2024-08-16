@@ -4,6 +4,8 @@ from time import time
 from typing import Any
 
 from olman_models import RemoteLibrary
+from olman_vcs_utils import downloadFile
+from olman_version_utils import version_eq, version_filter
 
 from olman_client import state, utils
 from olman_client.files import platform
@@ -22,7 +24,7 @@ class _sentinel:
 def _download():
     index_file_path.parent.mkdir(parents=True, exist_ok=True)
 
-    utils.downloadFile(
+    downloadFile(
         url=INDEX_FILE_LINK,
         dst=index_file_path,
         exist_ok=True,
@@ -68,7 +70,7 @@ def get(name: str, version_exact: str, *, default: Any = _sentinel) -> RemoteLib
     matches = libraries[name]
 
     for remote_lib in matches:
-        if utils.version_eq(remote_lib.manifest.library.version, version_exact):
+        if version_eq(remote_lib.manifest.library.version, version_exact):
             return remote_lib
 
     if default is _sentinel:
@@ -78,5 +80,24 @@ def get(name: str, version_exact: str, *, default: Any = _sentinel) -> RemoteLib
         return default
 
 
-def search(name: str, version: str) -> list[RemoteLibrary]:
-    pass
+# lib1 : ^1.23
+# lib1 : ==1.23
+# lib1 : >=1.23, <= 1.48
+# lib1 : <=1.23
+def search(name: str, constraint: str | None) -> list[RemoteLibrary]:
+    libraries = _load()
+
+    if name not in libraries:
+        return []
+
+    available_versions = libraries[name]
+    filtered_versions = [
+        x
+        for x in version_filter(
+            constraint,
+            available_versions,
+            key=lambda x: x.manifest.library.version,
+        )
+    ]
+
+    return list(reversed(filtered_versions))
