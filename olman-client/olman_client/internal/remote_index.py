@@ -64,10 +64,15 @@ def update(force: bool = False) -> bool:
     return False
 
 
-def get(name: str, version_exact: str, *, default: Any = _sentinel) -> RemoteLibrary:
+def get(
+    name: str, version_exact: str | None, *, default: Any = _sentinel
+) -> RemoteLibrary:
     libraries = _load()
 
     matches = libraries[name]
+
+    if version_exact is None:
+        return matches[0]
 
     for remote_lib in matches:
         if version_eq(remote_lib.manifest.library.version, version_exact):
@@ -91,13 +96,18 @@ def search(name: str, constraint: str | None) -> list[RemoteLibrary]:
         return []
 
     available_versions = libraries[name]
-    filtered_versions = [
-        x
-        for x in version_filter(
-            constraint,
-            available_versions,
-            key=lambda x: x.manifest.library.version,
-        )
-    ]
+
+    if constraint is not None:
+        filtered_versions = [
+            x
+            for x in version_filter(
+                constraint,
+                available_versions,
+                key=lambda x: x.manifest.library.version,
+            )
+        ]
+
+    else:
+        filtered_versions = available_versions
 
     return list(reversed(filtered_versions))
