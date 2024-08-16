@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "olman-cli"
+version = "0.1.0"
+description = ""
+authors = ["Jack OAT <jack.oat29@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+olman-client = {path = "../olman-client"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+olman = 'main:main'
