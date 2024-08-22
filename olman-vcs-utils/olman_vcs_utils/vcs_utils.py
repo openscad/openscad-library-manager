@@ -1,4 +1,5 @@
 from pathlib import Path
+from shutil import copy2
 from urllib.request import urlretrieve
 
 
@@ -88,6 +89,6 @@ def downloadFile(url: str, dst: str | Path, exist_ok: bool = False) -> Path:
 
     else:
         dst.parent.mkdir(parents=True, exist_ok=True)
-        dst = tmp_path.rename(dst)
+        copy2(tmp_path, dst)
 
     return dst
