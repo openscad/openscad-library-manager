@@ -38,7 +38,7 @@ def install(name: str, version_exact: str, *, force=False, reinstall=False):
     lib_path = utils.extractFile(compressed_lib_path, dst_dir=INSTALL_LOCATION)
     lib_path = lib_path.rename(lib_path.with_name(name))
     compressed_lib_path.unlink()
-    local_index.add(remote_lib.manifest, lib_path)
+    local_index.add(remote_lib.manifest, lib_path.absolute())
 
 
 def remove(name: str, missing_ok: bool = True):
