@@ -1,7 +1,6 @@
+import os
 from pathlib import Path
 
-TEST_DIR = Path(__file__).parent / "output_dir"
-# TEST_DIR.mkdir(parents=True, exist_ok=True)
 OLMAN_FOLDER_NAME = "olman"
 
 
@@ -12,7 +11,6 @@ def getXdgConfigDir() -> Path:
 
     see: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
     """
-    return TEST_DIR / "config"  # TODO: Remove
     return Path(os.environ.get("XDG_CONFIG_HOME", "~/.config")).expanduser()
 
 
@@ -23,7 +21,6 @@ def getXdgDataDir() -> Path:
 
     see: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
     """
-    return TEST_DIR / "data"  # TODO: Remove
     return Path(os.environ.get("XDG_DATA_HOME", "~/.local/share")).expanduser()
 
 
@@ -36,7 +33,6 @@ def getXdgStateDir() -> Path:
 
     see: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
     """
-    return TEST_DIR / "state"  # TODO: Remove
     return Path(os.environ.get("XDG_STATE_HOME", "~/.local/state")).expanduser()
 
 
@@ -46,7 +42,6 @@ def getXdgCacheDir() -> Path:
 
     see: https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
     """
-    return TEST_DIR / "cache"  # TODO: Remove
     return Path(os.environ.get("XDG_CACHE_HOME", "~/.cache")).expanduser()
 
 
