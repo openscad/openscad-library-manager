@@ -1,3 +1,5 @@
+#! /bin/python3
+
 import argparse
 
 from olman_cli.info import info
@@ -14,6 +16,7 @@ def main():
         prog="olman",
         description="OpenSCAD Library Manager",
     )
+    main_parser.set_defaults(func=lambda x: main_parser.print_help())
 
     subparsers = main_parser.add_subparsers()
 

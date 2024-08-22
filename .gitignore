@@ -5,3 +5,4 @@
 *.new
 *.code-workspace
 dist/
+*.snap
