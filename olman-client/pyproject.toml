@@ -7,9 +7,9 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-olman-models = {path = "../olman-models"}
-olman-version-utils = {path = "../olman-version-utils"}
-olman-vcs-utils = {path = "../olman-vcs-utils"}
+olman-models = { path = "../olman-models" }
+olman-version-utils = { path = "../olman-version-utils" }
+olman-vcs-utils = { path = "../olman-vcs-utils" }
 
 
 [build-system]
