@@ -1,0 +1,40 @@
+name: olman
+title: olman - The OpenSCAD Library Manager
+base: core24
+version: "0.0.1"
+summary: The OpenSCAD Library Manager
+description: >
+  The OpenSCAD Library Manager
+confinement: strict
+license: MIT
+grade: devel
+platforms:
+  amd64:
+  arm64:
+
+apps:
+  olman:
+    # command: bin/olman
+    command: bin/python3 -m olman_cli
+    plugs:
+      - desktop
+      - home
+      - network
+  
+
+parts:
+  libversion:
+    source: "https://github.com/repology/libversion/archive/refs/tags/3.0.3.tar.gz"
+    plugin: cmake
+    cmake-parameters:
+      - -DCMAKE_INSTALL_PREFIX=/usr
+  olman:
+    plugin: python
+    source: "https://github.com/openscad/openscad-library-manager/archive/refs/heads/main.tar.gz"
+    source-subdir: olman-cli
+    after:
+      - libversion
+    python-packages:
+      - libversion
+    build-packages:
+      - pkg-config
