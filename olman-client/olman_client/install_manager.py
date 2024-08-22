@@ -29,9 +29,7 @@ def install(name: str, version_exact: str, *, force=False, reinstall=False):
         else:
             raise Exception("Another version is already installed")
 
-    remote_lib = remote_index.get(
-        name, version_exact, default=None
-    )  # TODO: change 'get' to search?
+    remote_lib = remote_index.get(name, version_exact, default=None)
 
     if remote_lib is None:
         raise Exception(f"Could not find {name}:{version_exact} in the index")

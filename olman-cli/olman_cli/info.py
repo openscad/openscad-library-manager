@@ -12,4 +12,5 @@ def info(parser: argparse.ArgumentParser, args: list[str]):
 
     name = args.name
 
-    pprint(api.info(name))
+    for k, v in api.info(name).items():
+        print(f"{k}: {v}")

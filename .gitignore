@@ -4,3 +4,4 @@
 *.old
 *.new
 *.code-workspace
+dist/

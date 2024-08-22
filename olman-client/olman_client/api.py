@@ -33,7 +33,7 @@ def remove(name: str) -> bool:
 # TODO: implement "list" to return all versions of a library
 
 
-def search(name: str, constraint: str | None = None) -> list:
+def search(name: str, constraint: str | None = None) -> list[tuple[str, str]]:
     "Search for libraries in the index. Supports regex and/or glob?"
     matches = remote_index.search(name, constraint)
 
@@ -42,12 +42,14 @@ def search(name: str, constraint: str | None = None) -> list:
     ]
 
 
-# TODO: return json?
-def info(name: str, version: str | None = None) -> str:
+def info(name: str, version: str | None = None) -> dict[str, str]:
     "Get library information"
     remote_lib = remote_index.get(name, version)
 
     short_description = remote_lib.manifest.library.short_description
     long_description = remote_lib.manifest.library.long_description
 
-    return f"{short_description}\n\n{long_description}"
+    return {
+        "short_description": short_description,
+        "long_description": long_description,
+    }
