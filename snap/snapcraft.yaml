@@ -14,7 +14,6 @@ platforms:
 
 apps:
   olman:
-    # command: bin/olman
     command: bin/python3 -m olman_cli
     plugs:
       - desktop

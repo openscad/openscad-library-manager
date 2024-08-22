@@ -97,7 +97,7 @@ def search(name: str, constraint: str | None) -> list[RemoteLibrary]:
 
     available_versions = libraries[name]
 
-    if constraint is not None:
+    if constraint:
         filtered_versions = [
             x
             for x in version_filter(
