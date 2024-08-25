@@ -14,14 +14,20 @@ platforms:
   amd64:
   arm64:
 
+plugs:
+  home-dot-folders-olman:
+    interface: personal-files
+    write:
+      - $HOME/.cache/olman
+      - $HOME/.local/share/olman
+
 apps:
   olman:
     command: bin/python3 -m olman_cli
     plugs:
-      - desktop
       - home
       - network
-  
+      - home-dot-folders-olman
 
 parts:
   libversion:
