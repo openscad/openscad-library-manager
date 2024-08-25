@@ -8,6 +8,8 @@ description: >
 confinement: strict
 license: MIT
 grade: devel
+environment:
+  HOME: $SNAP_REAL_HOME
 platforms:
   amd64:
   arm64:
