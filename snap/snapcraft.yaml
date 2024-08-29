@@ -15,10 +15,11 @@ platforms:
   arm64:
 
 plugs:
-  home-dot-folders-olman:
+  home-xdg-dot-folders-olman:
     interface: personal-files
     write:
       - $HOME/.cache/olman
+      - $HOME/.config/olman
       - $HOME/.local/share/olman
 
 apps:
@@ -27,7 +28,7 @@ apps:
     plugs:
       - home
       - network
-      - home-dot-folders-olman
+      - home-xdg-dot-folders-olman
 
 parts:
   libversion:
