@@ -1,12 +1,14 @@
-FROM ubuntu:24.04
+FROM ubuntu:20.04
 
-ARG PYTHON_VERSION=3
+ARG PYTHON_VERSION=3.12
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get upgrade -y
 
-RUN apt-get install -y --no-install-recommends wget gpg ca-certificates
+RUN apt-get install -y --no-install-recommends wget gpg ca-certificates software-properties-common
+
+RUN add-apt-repository ppa:deadsnakes/ppa -y
 
 RUN wget -qO - https://files.openscad.org/OBS-Repository-Key.pub | gpg --dearmor -o /etc/apt/trusted.gpg.d/obs-openscad.gpg
 
