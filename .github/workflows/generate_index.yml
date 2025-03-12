@@ -65,7 +65,7 @@ jobs:
           cat ${{ steps.configuration.outputs.path }}/${{ steps.configuration.outputs.filename }}
 
       - name: Upload index file to workflow artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: ${{ steps.configuration.outputs.path }}/${{ steps.configuration.outputs.filename }}
           name: ${{ steps.configuration.outputs.artifact }}
@@ -78,7 +78,7 @@ jobs:
 
     steps:
       - name: Download index
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v4.1.9
         with:
           path: ${{ needs.generate.outputs.path }}
           name: ${{ needs.generate.outputs.artifact }}
