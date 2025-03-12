@@ -9,8 +9,8 @@ env:
   INDEX_FILE_NAME: "remote_index.json"
 
 on:
-  # schedule:
-  #   - cron: "30 * * * *"
+  schedule:
+    - cron: "5 5 * * 5"
 
   workflow_dispatch:
 
