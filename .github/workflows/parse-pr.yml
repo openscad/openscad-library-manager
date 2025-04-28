@@ -107,7 +107,7 @@ jobs:
         poetry install --directory="${{ github.workspace }}/olman-remote"
 
     - name: Download diff
-      uses: actions/download-artifact@v4.2.1
+      uses: actions/download-artifact@v4.3.0
       with:
         path: ${{ needs.diff.outputs.path }}
         name: ${{ needs.diff.outputs.artifact }}
