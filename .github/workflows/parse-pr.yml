@@ -12,6 +12,8 @@ on:
     - opened
     - ready_for_review
     - synchronize
+    paths:
+    - 'output_files/**'
 
 jobs:
   diff:
