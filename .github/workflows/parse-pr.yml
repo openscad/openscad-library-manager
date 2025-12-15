@@ -66,7 +66,7 @@ jobs:
           echo -E "head=$(jq -c .head.sha "${{ steps.configuration.outputs.path }}/${{ env.JSON_IDENTIFIER }}")" >> $GITHUB_OUTPUT
 
       - name: Upload diff file to workflow artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           path: ${{ steps.configuration.outputs.path }}/${{ steps.configuration.outputs.filename }}
           name: ${{ steps.configuration.outputs.artifact }}
@@ -109,7 +109,7 @@ jobs:
         poetry install --directory="${{ github.workspace }}/olman-remote"
 
     - name: Download diff
-      uses: actions/download-artifact@v6.0.0
+      uses: actions/download-artifact@v7.0.0
       with:
         path: ${{ needs.diff.outputs.path }}
         name: ${{ needs.diff.outputs.artifact }}
