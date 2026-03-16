@@ -78,7 +78,7 @@ jobs:
 
     steps:
       - name: Download index
-        uses: actions/download-artifact@v8.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           path: ${{ needs.generate.outputs.path }}
           name: ${{ needs.generate.outputs.artifact }}
